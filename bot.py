@@ -11,27 +11,27 @@ load_dotenv()
 api = os.getenv('API')
 bot_api = os.getenv('BOT_API')
 
-# Имя файла для хранения регламентов
+
 REGULATIONS_FILE = 'regulations.json'
 
 def load_regulations():
     try:
         with open(REGULATIONS_FILE, 'r', encoding='utf-8') as f:
             data = f.read()
-            # Проверяем, пустой ли файл
+    
             if data: 
-                return json.loads(data)  # <-- Используем json.loads(data)
+                return json.loads(data)  
             else:
-                return {}  # Возвращаем пустой словарь, если файл пустой
+                return {}  
     except FileNotFoundError:
-        return {}  # Возвращаем пустой словарь, если файл не найден
+        return {}  
 
 # Функция для сохранения регламентов в JSON-файл
 def save_regulations(regulations_data):
     with open(REGULATIONS_FILE, 'w', encoding='utf-8') as f:
         json.dump(regulations_data, f, indent=4, ensure_ascii=False)
 
-# Загружаем регламенты при запуске бота
+
 regulations = load_regulations()
 
 logging.basicConfig(
@@ -43,7 +43,7 @@ logging.basicConfig(
     ]
 )
 
-# Ваш API ключ Google Generative AI
+
 genai.configure(api_key=api)
 
 # Настройки модели
@@ -68,14 +68,14 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
 )
 
-# ID чата организатора (замените на фактический ID)
+
 organizer_chat_id = 704255878
 
-# Переменная для хранения прав и ID чата
+
 chat_permissions = None
 chat_id = None
 
-# Функция для загрузки промта из файла
+
 def load_prompt(filename):
     with open(filename, 'r', encoding='utf-8') as f:
         return f.read()
