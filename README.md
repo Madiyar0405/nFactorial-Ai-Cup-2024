@@ -1,11 +1,11 @@
 # nFactorial-Ai-Cup-2024
 Fork this repository and build nFactorial Ai Cup 2024 projects 
 
-## < Your Name >
+## < Madiyar >
 
-## < Your App's Name >
+## < Moder >
 
-## < Your App's description, technical considerations, etc. >
+## < An intelligent Telegram bot that helps event organizers automate answers to participants' questions using pre-loaded hackathon rules. >
 
 
 ## Typeform to submit:
