@@ -26,7 +26,6 @@ def load_regulations():
     except FileNotFoundError:
         return {}  
 
-# Функция для сохранения регламентов в JSON-файл
 def save_regulations(regulations_data):
     with open(REGULATIONS_FILE, 'w', encoding='utf-8') as f:
         json.dump(regulations_data, f, indent=4, ensure_ascii=False)
@@ -46,7 +45,6 @@ logging.basicConfig(
 
 genai.configure(api_key=api)
 
-# Настройки модели
 generation_config = {
     "temperature": 1,
     "top_p": 0.95,
@@ -61,7 +59,6 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
 ]
 
-# Создание модели
 model = genai.GenerativeModel(
     model_name="gemini-1.5-pro",
     safety_settings=safety_settings,
@@ -80,7 +77,6 @@ def load_prompt(filename):
     with open(filename, 'r', encoding='utf-8') as f:
         return f.read()
 
-# Обработчик команды /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -93,7 +89,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
              "Чтобы задать мне вопрос, просто напишите его в чат."
     )
 
-    # Добавление кнопки "Добавить в чат"
     keyboard = [
         [InlineKeyboardButton("Добавить меня в чат", url=f"https://t.me/modrr_bot?startgroup=AddToGroup")]
     ]
@@ -115,13 +110,12 @@ async def upload_regulations(update: Update, context: ContextTypes.DEFAULT_TYPE)
         logging.info("Команда /upload_regulations не из личного чата, игнорируем.")
         return
 
-    # Проверяем, был ли уже загружен регламент для этого пользователя
     if context.user_data.get('regulations_loaded', False):
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Вы уже загрузили регламент.")
         return
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Пожалуйста, отправьте текст регламента:")
-    return 1  # Ожидаем текст регламента
+    return 1  
 
 
 async def save_regulations_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -130,12 +124,10 @@ async def save_regulations_handler(update: Update, context: ContextTypes.DEFAULT
     save_regulations(regulations)
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Регламент успешно загружен!")
     
-    # Устанавливаем флаг, что регламент загружен
     context.user_data['regulations_loaded'] = True 
 
     return ConversationHandler.END
 
-# Обработчик сообщений
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global regulations
     user_message = update.message.text
@@ -143,7 +135,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
 
     if chat_type in [constants.ChatType.GROUP, constants.ChatType.SUPERGROUP]:
-        # Всегда используем регламент, сохраненный по ключу "default_regulations"
         if "default_regulations" in regulations: 
             regulations_text = regulations["default_regulations"]
             system_prompt = load_prompt('prompt.txt')
@@ -154,12 +145,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_message(chat_id=chat_id,
                                            text="Регламент не найден. Пожалуйста, обратитесь к организатору.")
 
-# Обработчик добавления бота в группу
 async def add_to_group(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global chat_permissions, chat_id
     chat_id = update.effective_chat.id
 
-    # Настройка прав бота в чате
     chat_permissions = ChatPermissions(
         can_send_messages=True,
         can_send_media_messages=True,
@@ -177,16 +166,12 @@ async def add_to_group(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=chat_id,
         text="Теперь я в вашем чате! Задавайте мне вопросы, я готов отвечать!"
     )
-
-# Запуск бота
 if __name__ == '__main__':
 
     application = ApplicationBuilder().token(bot_api).build()
-    # Добавляем обработчики
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
 
-    # ConversationHandler для загрузки регламента
     regulations_handler = ConversationHandler(
         entry_points=[CommandHandler('upload_regulations', upload_regulations)],
         states={
